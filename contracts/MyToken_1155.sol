@@ -53,10 +53,6 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         _mint(msg.sender, tokenId, amount, "");
     }
 
-    function balance() external view returns(uint) {
-        return address(this).balance;
-    }
-
     function uri(uint256 tokenId) public view override returns (string memory) {
         return string(abi.encodePacked(_tokenBaseUri, Strings.toString(tokenId)));
     }
