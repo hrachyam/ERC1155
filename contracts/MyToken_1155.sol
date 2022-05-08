@@ -10,19 +10,19 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
 
     uint public tokenPriceByEth;
-    uint public tokenPriceByUsdc;
+    uint public tokenPriceByErc20;
     uint public amountLimitOfToken;
     uint private _setCount;
     string private _tokenBaseUri;
 
-    constructor(string memory baseUri, uint priceByEth, uint priceByUsdc, uint setCount, uint amountLimit) 
+    constructor(string memory baseUri, uint priceByEth, uint priceByErc20, uint setCount, uint amountLimit) 
         ERC1155("") 
     {
         _tokenBaseUri = baseUri;
         _setCount = setCount;
         amountLimitOfToken = amountLimit; 
         tokenPriceByEth = priceByEth;
-        tokenPriceByUsdc = priceByUsdc;
+        tokenPriceByErc20 = priceByErc20;
     }
 
     event MintByEther(address indexed sender, uint indexed tokenId, uint256 amount);
@@ -44,7 +44,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         require(tokenId >= 1 && tokenId <= _setCount, "Incorrect Token ID!");
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
         IERC20 erc20Token = IERC20(erc20);
-        uint totalPrice = tokenPriceByUsdc * amount;
+        uint totalPrice = tokenPriceByErc20 * amount;
         require(erc20Token.balanceOf(msg.sender) >= totalPrice, "Insufficient balance to mint token!");
         require(erc20Token.allowance(msg.sender, address(this)) >= totalPrice, "Must be approved before transfering!");
         bool success = erc20Token.transferFrom(msg.sender, address(this), totalPrice);
