@@ -61,7 +61,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             const nonOwnerAddress = accounts[2];
             const tokenId = toBN(1);
             const amount = toBN(40);
-            const receipt = await myToken1155Contract.mintByEth(tokenId, amount, { from: nonOwnerAddress, value: toBN(40e16) });
+            const receipt = await myToken1155Contract.mintByEth(tokenId, amount, { from: nonOwnerAddress, value: toBN(tokenPriceByEth) * amount });
 
             expectEvent(receipt, 'MintByEther', {
                 sender: nonOwnerAddress,
@@ -77,6 +77,87 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
 
             const tokenBalance = await myToken1155Contract.balanceOf(nonOwnerAddress, tokenId);
             expect(tokenBalance.toString()).to.be.equal(amount.toString());
+
+            let balanceOfContract = await web3.eth.getBalance(myToken1155Contract.address);
+            expect(balanceOfContract.toString()).to.be.equal((tokenPriceByEth * amount).toString());
         });
     });
+
+    describe("mintByERC20", () => {
+        it('Should fail if not existing Token ID is specified', async () => {
+            const nonOwnerAddress = accounts[1];
+            const tokenId = 11;
+            const amount = 20;
+            await expectRevert(myToken1155Contract.mintByErc20(myToken20Mock.address, tokenId, amount, { from: nonOwnerAddress }), 'Incorrect Token ID!');
+        });
+
+        it('Should fail if Amount Limit is exceeded', async () => {
+            const nonOwnerAddress = accounts[1];
+            const tokenId = 1;
+            const amount = 1001;
+            await expectRevert(myToken1155Contract.mintByErc20(myToken20Mock.address, tokenId, amount, { from: nonOwnerAddress }), 'Total amount must be less than limit!');
+        });
+
+        it('Should fail if insufficient balance to mint token', async () => {
+            const nonOwnerAddress = accounts[2];
+            const tokenId = 1;
+            const amount = 40;
+            await expectRevert(myToken1155Contract.mintByErc20(myToken20Mock.address, tokenId, amount, { from: nonOwnerAddress }), 'Insufficient balance to mint token!');
+        });
+
+        it('Should fail if it is not approved before transfering', async () => {
+            const nonOwnerAddress = accounts[2];
+            const tokenId = 3
+            const amount = 50;
+            const totalCountOfErc20Tokens = 10000;
+            await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
+            const totalPrice = tokenPriceByErc20 * amount;
+            await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
+            const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
+            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens - totalPrice).toString());
+            const balance2 = await myToken20Mock.balanceOf(nonOwnerAddress);
+            expect(balance2.toString()).to.be.equal(totalPrice.toString());
+            await expectRevert(myToken1155Contract.mintByErc20(myToken20Mock.address, tokenId, amount, { from: nonOwnerAddress }), 'Must be approved before transfering!');
+        });
+
+        it('Should successfully mint token', async () => {
+            const nonOwnerAddress = accounts[2];
+            const spender = myToken1155Contract.address;
+            const tokenId = toBN(3)
+            const amount = toBN(50);
+            const totalCountOfErc20Tokens = toBN(10000);
+            await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
+            const totalPrice = tokenPriceByErc20 * amount;
+            await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
+            const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
+            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens - totalPrice).toString());
+            const balance2 = await myToken20Mock.balanceOf(nonOwnerAddress);
+            expect(balance2.toString()).to.be.equal(totalPrice.toString());
+            await myToken20Mock.approve(spender, totalPrice, {from: nonOwnerAddress});
+            const receipt = await myToken1155Contract.mintByErc20(myToken20Mock.address, tokenId, amount, { from: nonOwnerAddress });
+
+            expectEvent(receipt, 'MintByErc20', {
+                sender: nonOwnerAddress,
+                tokenId,
+                amount 
+            });
+
+            const isExist = await myToken1155Contract.exists(tokenId);
+            expect(isExist).to.be.true;
+
+            const totalSupply = await myToken1155Contract.totalSupply(tokenId);
+            expect(totalSupply.toString()).to.be.equal(amount.toString());
+
+            const tokenBalance = await myToken1155Contract.balanceOf(nonOwnerAddress, tokenId);
+            expect(tokenBalance.toString()).to.be.equal(amount.toString());
+
+            const balance3 = await myToken20Mock.balanceOf(nonOwnerAddress);
+            expect(balance3.toString()).to.be.equal('0');
+
+            const balance4 = await myToken20Mock.balanceOf(myToken1155Contract.address);
+            expect(balance4.toString()).to.be.equal(totalPrice.toString());
+        });
+   
+    });
+
 });
