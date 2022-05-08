@@ -15,7 +15,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
     const tokenBaseUri = 'test.base/uri/';
     const tokenPriceByEth = toBN(1e16);
     const tokenPriceByErc20 = 30;
-    const setCount = 10;
+    const countOfSet = 10;
     const amountLimitOfToken = 1000;
 
     // contracts
@@ -29,7 +29,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             tokenBaseUri,
             tokenPriceByEth,
             tokenPriceByErc20,
-            setCount,
+            countOfSet,
             amountLimitOfToken,
             { from: ownerAddress }
         );
@@ -159,22 +159,22 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
         });
     });
 
-    describe("changeSetCount", () => {
+    describe("changeCountOfSet", () => {
 
         it('Should fail if caller is not the contract owner', async () => {
             const nonOwnerAddress = accounts[1];
-            const setCount = 12;
-            await expectRevert(myToken1155Contract.changeSetCount(setCount, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
+            const countOfSet = 12;
+            await expectRevert(myToken1155Contract.changeCountOfSet(countOfSet, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
         });
 
-        it('Should fail if the specified Set Count is less than the exiting one', async () => {
-            const setCount = 9;
-            await expectRevert(myToken1155Contract.changeSetCount(setCount, { from: ownerAddress }), 'Set Count must be greater than the exiting one!');
+        it('Should fail if the specified Count of Set is less than the exiting one', async () => {
+            const countOfSet = 9;
+            await expectRevert(myToken1155Contract.changeCountOfSet(countOfSet, { from: ownerAddress }), 'Count of Set must be greater than the exiting one!');
         });
 
-        it('Should successfully change the Set Count', async () => {
-            const setCount = 12;
-            await myToken1155Contract.changeSetCount(setCount, { from: ownerAddress });
+        it('Should successfully change the Count of Set', async () => {
+            const countOfSet = 12;
+            await myToken1155Contract.changeCountOfSet(countOfSet, { from: ownerAddress });
         });
     });
 })
