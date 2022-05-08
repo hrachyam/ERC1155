@@ -5,5 +5,8 @@
     "bignumber": "^1.1.0",
     "dotenv": "^16.0.0",
     "truffle-plugin-verify": "^0.5.25"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6"
   }
 }
