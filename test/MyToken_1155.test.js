@@ -1,7 +1,7 @@
 const MyToken1155Contract = artifacts.require('MyToken_1155');
 const MyToken20Mock = artifacts.require('MyToken_20');
 
-const { expectRevert, expectEvent, constants } = require('@openzeppelin/test-helpers');
+const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 
 const { expect } = require('chai');
 const toBN = web3.utils.toBN;
@@ -157,7 +157,24 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             const balance4 = await myToken20Mock.balanceOf(myToken1155Contract.address);
             expect(balance4.toString()).to.be.equal(totalPrice.toString());
         });
-   
     });
 
-});
+    describe("changeSetCount", () => {
+
+        it('Should fail if caller is not the contract owner', async () => {
+            const nonOwnerAddress = accounts[1];
+            const setCount = 12;
+            await expectRevert(myToken1155Contract.changeSetCount(setCount, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
+        });
+
+        it('Should fail if the specified Set Count is less than the exiting one', async () => {
+            const setCount = 9;
+            await expectRevert(myToken1155Contract.changeSetCount(setCount, { from: ownerAddress }), 'Set Count must be greater than the exiting one!');
+        });
+
+        it('Should successfully change the Set Count', async () => {
+            const setCount = 12;
+            await myToken1155Contract.changeSetCount(setCount, { from: ownerAddress });
+        });
+    });
+})
