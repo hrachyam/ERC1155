@@ -31,7 +31,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     function mintByEth(uint256 tokenId, uint256 amount) 
         external payable nonReentrant 
     {
-        require(tokenId >= 1 && tokenId <= _setCount, "Incorrect Token ID");
+        require(tokenId >= 1 && tokenId <= _setCount, "Incorrect Token ID!");
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
         require(msg.value >= tokenPriceByEth * amount, "Insufficient Eth to mint token!");
         emit MintByEther(msg.sender, tokenId, amount);
