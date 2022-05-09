@@ -109,11 +109,11 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
 
         it('Should fail if it is not approved before transfering', async () => {
             const nonOwnerAddress = accounts[2];
-            const tokenId = 3
-            const amount = 50;
+            const tokenId = toBN(3);
+            const amount = toBN(50);
             const totalCountOfErc20Tokens = toBN("1000000000000000000000000");
             await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
-            const totalPrice = toBN(tokenPriceByErc20).mul(toBN(amount));
+            const totalPrice = tokenPriceByErc20.mul(amount);
             await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
             const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
             expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens.sub(totalPrice)).toString());
@@ -129,7 +129,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             const amount = toBN(50);
             const totalCountOfErc20Tokens = toBN("1000000000000000000000000");
             await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
-            const totalPrice = toBN(tokenPriceByErc20).mul(toBN(amount));
+            const totalPrice = tokenPriceByErc20.mul(amount);
             await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
             const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
             expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens.sub(totalPrice)).toString());
