@@ -46,8 +46,6 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
         IERC20 erc20Token = IERC20(erc20Address);
         uint totalPrice = tokenPriceByErc20 * amount;
-        require(erc20Token.balanceOf(msg.sender) >= totalPrice, "Insufficient balance to mint token!");
-        require(erc20Token.allowance(msg.sender, address(this)) >= totalPrice, "Must be approved before transfering!");
         erc20Token.transferFrom(msg.sender, address(this), totalPrice);
         emit MintByErc20(msg.sender, tokenId, amount);
         _mint(msg.sender, tokenId, amount, "");
