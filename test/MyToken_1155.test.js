@@ -15,7 +15,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
     const tokenBaseUri = 'test.base/uri/';
     const tokenPriceByEth = toBN(1e16);
     const tokenPriceByErc20 = 30;
-    const countOfSet = 10;
+    const maxTokenId = 10;
     const amountLimitOfToken = 1000;
 
     // contracts
@@ -29,7 +29,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             tokenBaseUri,
             tokenPriceByEth,
             tokenPriceByErc20,
-            countOfSet,
+            maxTokenId,
             amountLimitOfToken,
             { from: ownerAddress }
         );
@@ -159,22 +159,22 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
         });
     });
 
-    describe("changeCountOfSet", () => {
+    describe("changemaxTokenId", () => {
 
         it('Should fail if caller is not the contract owner', async () => {
             const nonOwnerAddress = accounts[1];
-            const countOfSet = 12;
-            await expectRevert(myToken1155Contract.changeCountOfSet(countOfSet, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
+            const maxTokenId = 12;
+            await expectRevert(myToken1155Contract.changemaxTokenId(maxTokenId, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
         });
 
-        it('Should fail if the specified Count of Set is less than the exiting one', async () => {
-            const countOfSet = 9;
-            await expectRevert(myToken1155Contract.changeCountOfSet(countOfSet, { from: ownerAddress }), 'Count of Set must be greater than the exiting one!');
+        it('Should fail if the specified Max Token ID is less than the exiting one', async () => {
+            const maxTokenId = 9;
+            await expectRevert(myToken1155Contract.changemaxTokenId(maxTokenId, { from: ownerAddress }), 'Max Token ID must be greater than the exiting one!');
         });
 
-        it('Should successfully change the Count of Set', async () => {
-            const countOfSet = 12;
-            await myToken1155Contract.changeCountOfSet(countOfSet, { from: ownerAddress });
+        it('Should successfully change the Max Token ID', async () => {
+            const maxTokenId = 12;
+            await myToken1155Contract.changemaxTokenId(maxTokenId, { from: ownerAddress });
         });
     });
 })

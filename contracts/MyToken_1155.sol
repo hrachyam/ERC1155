@@ -12,14 +12,14 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     uint public tokenPriceByEth;
     uint public tokenPriceByErc20;
     uint public amountLimitOfToken;
-    uint public countOfSet;
+    uint public maxTokenId;
     string private _tokenBaseUri;
 
-    constructor(string memory baseUri, uint priceByEth, uint priceByErc20, uint countOfSetForToken, uint amountLimit) 
+    constructor(string memory baseUri, uint priceByEth, uint priceByErc20, uint maxToken, uint amountLimit) 
         ERC1155("") 
     {
         _tokenBaseUri = baseUri;
-        countOfSet = countOfSetForToken;
+        maxTokenId = maxToken;
         amountLimitOfToken = amountLimit; 
         tokenPriceByEth = priceByEth;
         tokenPriceByErc20 = priceByErc20;
@@ -31,7 +31,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     function mintByEth(uint256 tokenId, uint256 amount) 
         external payable nonReentrant 
     {
-        require(tokenId >= 1 && tokenId <= countOfSet, "Incorrect Token ID!");
+        require(tokenId >= 1 && tokenId <= maxTokenId, "Incorrect Token ID!");
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
         require(msg.value >= tokenPriceByEth * amount, "Insufficient Eth to mint token!");
         emit MintByEther(msg.sender, tokenId, amount);
@@ -41,7 +41,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     function mintByErc20(address erc20, uint256 tokenId, uint256 amount) 
         external payable nonReentrant 
     {
-        require(tokenId >= 1 && tokenId <= countOfSet, "Incorrect Token ID!");
+        require(tokenId >= 1 && tokenId <= maxTokenId, "Incorrect Token ID!");
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
         IERC20 erc20Token = IERC20(erc20);
         uint totalPrice = tokenPriceByErc20 * amount;
@@ -57,9 +57,9 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         return string(abi.encodePacked(_tokenBaseUri, Strings.toString(tokenId)));
     }
 
-    function changeCountOfSet(uint countOfSetForToken) external onlyOwner  {
-        require(countOfSet < countOfSetForToken, "Count of Set must be greater than the exiting one!");
-        countOfSet = countOfSetForToken;
+    function changemaxTokenId(uint maxToken) external onlyOwner  {
+        require(maxTokenId < maxToken, "Max Token ID must be greater than the exiting one!");
+        maxTokenId = maxToken;
     }
 
     function changeAmountLimitOfToken(uint amountLimit) external onlyOwner  {
