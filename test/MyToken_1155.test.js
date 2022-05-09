@@ -40,22 +40,22 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
     describe("mintByEth", () => {
         it('Should fail if not existing Token ID is specified', async () => {
             const nonOwnerAddress = accounts[1];
-            const tokenId = 11;
-            const amount = 20;
+            const tokenId = toBN(11);
+            const amount = toBN(20);
             await expectRevert(myToken1155Contract.mintByEth(tokenId, amount, { from: nonOwnerAddress }), 'Incorrect Token ID!');
         });
 
         it('Should fail if Amount Limit is exceeded', async () => {
             const nonOwnerAddress = accounts[1];
-            const tokenId = 1;
-            const amount = 1001;
+            const tokenId = toBN(1);
+            const amount = toBN(1001);
             await expectRevert(myToken1155Contract.mintByEth(tokenId, amount, { from: nonOwnerAddress }), 'Total amount must be less than limit!');
         });
 
         it('Should fail if insufficient Ether to mint token', async () => {
             const nonOwnerAddress = accounts[2];
-            const tokenId = 1;
-            const amount = 40;
+            const tokenId = toBN(1);
+            const amount = toBN(40);
             await expectRevert(myToken1155Contract.mintByEth(tokenId, amount, { from: nonOwnerAddress, value: toBN(39e16) }), 'Insufficient Eth to mint token!');
         });
 
@@ -88,22 +88,22 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
     describe("mintByERC20", () => {
         it('Should fail if not existing Token ID is specified', async () => {
             const nonOwnerAddress = accounts[1];
-            const tokenId = 11;
-            const amount = 20;
+            const tokenId = toBN(11);
+            const amount = toBN(20);
             await expectRevert(myToken1155Contract.mintByErc20(tokenId, amount, { from: nonOwnerAddress }), 'Incorrect Token ID!');
         });
 
         it('Should fail if Amount Limit is exceeded', async () => {
             const nonOwnerAddress = accounts[1];
-            const tokenId = 1;
-            const amount = 1001;
+            const tokenId = toBN(1);
+            const amount = toBN(1001);
             await expectRevert(myToken1155Contract.mintByErc20(tokenId, amount, { from: nonOwnerAddress }), 'Total amount must be less than limit!');
         });
 
         it('Should fail if insufficient balance to mint token', async () => {
             const nonOwnerAddress = accounts[2];
-            const tokenId = 1;
-            const amount = 40;
+            const tokenId = toBN(1);
+            const amount = toBN(40);
             await expectRevert(myToken1155Contract.mintByErc20(tokenId, amount, { from: nonOwnerAddress }), 'Insufficient balance to mint token!');
         });
 
@@ -165,17 +165,17 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
 
         it('Should fail if caller is not the contract owner', async () => {
             const nonOwnerAddress = accounts[1];
-            const maxTokenId = 12;
+            const maxTokenId = toBN(12);
             await expectRevert(myToken1155Contract.changeMaxTokenId(maxTokenId, { from: nonOwnerAddress }), 'Ownable: caller is not the owner.');
         });
 
         it('Should fail if the specified Max Token ID is less than the exiting one', async () => {
-            const maxTokenId = 9;
+            const maxTokenId = toBN(9);
             await expectRevert(myToken1155Contract.changeMaxTokenId(maxTokenId, { from: ownerAddress }), 'Max Token ID must be greater than the exiting one!');
         });
 
         it('Should successfully change the Max Token ID', async () => {
-            const maxTokenId = 12;
+            const maxTokenId = toBN(12);
             await myToken1155Contract.changeMaxTokenId(maxTokenId, { from: ownerAddress });
         });
     });
