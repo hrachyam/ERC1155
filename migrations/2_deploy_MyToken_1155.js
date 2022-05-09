@@ -10,8 +10,7 @@ module.exports = async function (deployer, network) {
   if (network !== 'mainnet') { 
     // deploy your ERC20 and use it's address instead of the address from env variable 
     await deployer.deploy(MyToken_20, 'Hrach USDC','HUSDC');
-    const erc20 = await MyToken_20.deployed();
-    erc20Address = erc20.address;
+    erc20Address = MyToken_20.address;
   } 
   deployer.deploy(MyToken_1155, TOKEN_BASE_URI, 
     new BigNumber(TOKEN_PRICE_BY_ETH),

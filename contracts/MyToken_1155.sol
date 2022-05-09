@@ -13,14 +13,12 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     uint public tokenPriceByErc20;
     uint public amountLimitOfToken;
     uint public maxTokenId;
-    string private _tokenBaseUri;
     address public erc20Address;
 
     constructor(string memory baseUri, uint priceByEth, uint priceByErc20, 
         uint maxToken, uint amountLimit, address tokenAddress) 
-        ERC1155("") 
+        ERC1155(baseUri) 
     {
-        _tokenBaseUri = baseUri;
         maxTokenId = maxToken;
         amountLimitOfToken = amountLimit; 
         tokenPriceByEth = priceByEth;
@@ -50,14 +48,13 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         uint totalPrice = tokenPriceByErc20 * amount;
         require(erc20Token.balanceOf(msg.sender) >= totalPrice, "Insufficient balance to mint token!");
         require(erc20Token.allowance(msg.sender, address(this)) >= totalPrice, "Must be approved before transfering!");
-        bool success = erc20Token.transferFrom(msg.sender, address(this), totalPrice);
-        require(success, "Failed to transfer!");
+        erc20Token.transferFrom(msg.sender, address(this), totalPrice);
         emit MintByErc20(msg.sender, tokenId, amount);
         _mint(msg.sender, tokenId, amount, "");
     }
 
     function uri(uint256 tokenId) public view override returns (string memory) {
-        return string(abi.encodePacked(_tokenBaseUri, Strings.toString(tokenId)));
+        return string(abi.encodePacked(super.uri(tokenId), Strings.toString(tokenId)));
     }
 
     function changeMaxTokenId(uint maxToken) external onlyOwner  {
@@ -71,7 +68,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     }
 
     function changeBaseUri(string calldata baseUri) external onlyOwner  {
-        _tokenBaseUri = baseUri;
+        _setURI(baseUri);
     }
 
     function withdraw(uint _amount) external payable onlyOwner {
