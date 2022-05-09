@@ -1,7 +1,7 @@
 require('dotenv').config()
 var BigNumber = require('bignumber.js');
 
-const {TOKEN_BASE_URI, TOKEN_PRICE_BY_ETH, TOKEN_PRICE_BY_ERC20, MAX_TOKEN_ID, AMOUNT_LIMIT_OF_TOKEN} = process.env;
+const {TOKEN_BASE_URI, TOKEN_PRICE_BY_ETH, TOKEN_PRICE_BY_ERC20, MAX_TOKEN_ID, AMOUNT_LIMIT_OF_TOKEN, ERC20_ADDRESS} = process.env;
 const MyToken_1155 = artifacts.require('MyToken_1155');
 
 module.exports = function (deployer) {
@@ -9,6 +9,7 @@ module.exports = function (deployer) {
     new BigNumber(TOKEN_PRICE_BY_ETH),
     new BigNumber(TOKEN_PRICE_BY_ERC20), 
     new BigNumber(MAX_TOKEN_ID),
-    new BigNumber(AMOUNT_LIMIT_OF_TOKEN)
+    new BigNumber(AMOUNT_LIMIT_OF_TOKEN),
+    ERC20_ADDRESS
     );
 };

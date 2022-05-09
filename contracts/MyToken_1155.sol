@@ -14,8 +14,10 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
     uint public amountLimitOfToken;
     uint public maxTokenId;
     string private _tokenBaseUri;
+    address public erc20Address;
 
-    constructor(string memory baseUri, uint priceByEth, uint priceByErc20, uint maxToken, uint amountLimit) 
+    constructor(string memory baseUri, uint priceByEth, uint priceByErc20, 
+        uint maxToken, uint amountLimit, address tokenAddress) 
         ERC1155("") 
     {
         _tokenBaseUri = baseUri;
@@ -23,6 +25,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         amountLimitOfToken = amountLimit; 
         tokenPriceByEth = priceByEth;
         tokenPriceByErc20 = priceByErc20;
+        erc20Address = tokenAddress;
     }
 
     event MintByEther(address indexed sender, uint indexed tokenId, uint256 amount);
@@ -38,12 +41,12 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         _mint(msg.sender, tokenId, amount, "");
     }
 
-    function mintByErc20(address erc20, uint256 tokenId, uint256 amount) 
+    function mintByErc20(uint256 tokenId, uint256 amount) 
         external payable nonReentrant 
     {
         require(tokenId >= 1 && tokenId <= maxTokenId, "Incorrect Token ID!");
         require(totalSupply(tokenId) + amount <= amountLimitOfToken, "Total amount must be less than limit!");
-        IERC20 erc20Token = IERC20(erc20);
+        IERC20 erc20Token = IERC20(erc20Address);
         uint totalPrice = tokenPriceByErc20 * amount;
         require(erc20Token.balanceOf(msg.sender) >= totalPrice, "Insufficient balance to mint token!");
         require(erc20Token.allowance(msg.sender, address(this)) >= totalPrice, "Must be approved before transfering!");
@@ -57,7 +60,7 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         return string(abi.encodePacked(_tokenBaseUri, Strings.toString(tokenId)));
     }
 
-    function changemaxTokenId(uint maxToken) external onlyOwner  {
+    function changeMaxTokenId(uint maxToken) external onlyOwner  {
         require(maxTokenId < maxToken, "Max Token ID must be greater than the exiting one!");
         maxTokenId = maxToken;
     }
