@@ -69,9 +69,13 @@ contract MyToken_1155 is ERC1155Supply, Ownable, ReentrancyGuard {
         _setURI(baseUri);
     }
 
-    function withdraw(uint _amount) external payable onlyOwner {
+    function withdrawEth(uint _amount) external payable onlyOwner {
         require(_amount <= address(this).balance, "Not enough amount of Ether!");
         (bool success, ) = msg.sender.call{value: _amount}("");
         require(success, "Failed to transfer!");
+    }
+
+    function withdrawErc20Token(uint _amount) external payable onlyOwner {
+        IERC20(erc20Address).transfer(msg.sender, _amount);
     }
 }
