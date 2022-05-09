@@ -2,6 +2,7 @@ const MyToken1155Contract = artifacts.require('MyToken_1155');
 const MyToken20Mock = artifacts.require('MyToken_20');
 
 const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
+const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
 const { expect } = require('chai');
 const toBN = web3.utils.toBN;
@@ -14,7 +15,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
     // constructor params
     const tokenBaseUri = 'test.base/uri/';
     const tokenPriceByEth = toBN(1e16);
-    const tokenPriceByErc20 = 30;
+    const tokenPriceByErc20 = toBN(30e18);
     const maxTokenId = 10;
     const amountLimitOfToken = 1000;
 
@@ -110,12 +111,12 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             const nonOwnerAddress = accounts[2];
             const tokenId = 3
             const amount = 50;
-            const totalCountOfErc20Tokens = 10000;
+            const totalCountOfErc20Tokens = toBN("1000000000000000000000000");
             await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
-            const totalPrice = tokenPriceByErc20 * amount;
+            const totalPrice = toBN(tokenPriceByErc20).mul(toBN(amount));
             await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
             const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
-            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens - totalPrice).toString());
+            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens.sub(totalPrice)).toString());
             const balance2 = await myToken20Mock.balanceOf(nonOwnerAddress);
             expect(balance2.toString()).to.be.equal(totalPrice.toString());
             await expectRevert(myToken1155Contract.mintByErc20(tokenId, amount, { from: nonOwnerAddress }), 'Must be approved before transfering!');
@@ -124,14 +125,14 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
         it('Should successfully mint token', async () => {
             const nonOwnerAddress = accounts[2];
             const spender = myToken1155Contract.address;
-            const tokenId = toBN(3)
+            const tokenId = toBN(3);
             const amount = toBN(50);
-            const totalCountOfErc20Tokens = toBN(10000);
+            const totalCountOfErc20Tokens = toBN("1000000000000000000000000");
             await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
-            const totalPrice = tokenPriceByErc20 * amount;
+            const totalPrice = toBN(tokenPriceByErc20).mul(toBN(amount));
             await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
             const balance1 = await myToken20Mock.balanceOf(myToken20MockOwnerAddress);
-            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens - totalPrice).toString());
+            expect(balance1.toString()).to.be.equal((totalCountOfErc20Tokens.sub(totalPrice)).toString());
             const balance2 = await myToken20Mock.balanceOf(nonOwnerAddress);
             expect(balance2.toString()).to.be.equal(totalPrice.toString());
             await myToken20Mock.approve(spender, totalPrice, {from: nonOwnerAddress});
