@@ -105,7 +105,7 @@ contract("MyToken_1155 Contract Test Suite", function (accounts) {
             const spender = myToken1155Contract.address;
             const tokenId = toBN(3);
             const amount = toBN(50);
-            const totalCountOfErc20Tokens = toBN("1000000000000000000000000");
+            const totalCountOfErc20Tokens = web3.utils.toWei(toBN(1000000), 'ether'); // toBN("1000000000000000000000000")
             await myToken20Mock.mint(totalCountOfErc20Tokens, { from: myToken20MockOwnerAddress});
             const totalPrice = tokenPriceByErc20.mul(amount);
             await myToken20Mock.transfer(nonOwnerAddress, totalPrice, {from: myToken20MockOwnerAddress});
